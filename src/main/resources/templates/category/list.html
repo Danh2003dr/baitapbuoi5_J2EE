@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{_layout :: layout(~{::#main})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý danh mục</title>
+</head>
+<body>
+    <div id="main">
+        <div class="card-app">
+            <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <span>Quản lý danh mục</span>
+                <a th:href="@{/categories/add}" class="btn btn-light btn-sm">+ Thêm danh mục</a>
+            </div>
+            <div class="card-body p-0">
+                <p class="px-4 pt-3 mb-0 text-muted small">Phân loại sản phẩm theo danh mục. Thêm, sửa hoặc xóa danh mục bên dưới.</p>
+                <div class="table-responsive">
+                    <table class="table table-app table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Tên danh mục</th>
+                                <th scope="col" class="text-end">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(categories)}">
+                                <td colspan="3" class="text-center text-muted py-5">Chưa có danh mục nào. Nhấn "Thêm danh mục" để tạo mới.</td>
+                            </tr>
+                            <tr th:each="cat : ${categories}">
+                                <th scope="row" th:text="${cat.id}"></th>
+                                <td><span class="badge badge-category text-black bg-slate-200 dark:bg-slate-600 dark:text-white px-2 py-1 rounded" th:text="${cat.name}"></span></td>
+                                <td class="text-end">
+                                    <a th:href="@{/categories/edit/{id}(id=${cat.id})}" class="btn btn-outline-app btn-sm">Sửa</a>
+                                    <a th:href="@{/categories/delete/{id}(id=${cat.id})}" class="btn btn-outline-danger btn-sm"
+                                       onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">Xóa</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

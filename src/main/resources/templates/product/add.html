@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{_layout :: layout(~{::#main})}">
+<head>
+     <meta charset="utf-8"/>
+    <title>Thêm/Sửa sản phẩm</title>
+</head>
+<body>
+    <div id="main" class="max-w-5xl mx-auto w-full">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+            <a class="hover:text-primary transition-colors" th:href="@{/}">Trang chủ</a>
+            <span class="material-symbols-outlined text-xs">chevron_right</span>
+            <a class="hover:text-primary transition-colors" th:href="@{/products}">Sản phẩm</a>
+            <span class="material-symbols-outlined text-xs">chevron_right</span>
+            <span class="text-slate-900 dark:text-slate-100 font-medium" th:text="${product.id == null || product.id == 0} ? 'Thêm sản phẩm' : 'Sửa sản phẩm'">Thêm sản phẩm</span>
+        </nav>
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-black tracking-tight" th:text="${product.id == null || product.id == 0} ? 'Thêm sản phẩm mới' : 'Sửa sản phẩm'">Thêm sản phẩm mới</h1>
+            <p class="text-slate-500 mt-2">Điền thông tin chi tiết để tạo sản phẩm trong hệ thống.</p>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <form th:action="@{/products/save}" th:object="${product}" method="post" enctype="multipart/form-data" class="p-6 md:p-8 space-y-8" id="productForm">
+                <input type="hidden" th:field="*{id}" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="col-span-full">
+                        <label class="block text-sm font-semibold mb-2" for="name">Tên sản phẩm</label>
+                        <input class="w-full h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" type="text" th:field="*{name}" id="name" placeholder="Nhập tên sản phẩm"/>
+                        <p class="text-red-500 text-sm mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" for="price">Giá (VNĐ)</label>
+                        <div class="relative">
+                            <input class="w-full h-12 pl-4 pr-12 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" type="number" th:field="*{price}" id="price" placeholder="0" min="0" step="1000"/>
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">VNĐ</span>
+                        </div>
+                        <p class="text-red-500 text-sm mt-1" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2" for="category">Danh mục</label>
+                        <select name="category" class="w-full h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none cursor-pointer" id="category" required>
+                            <option value="">Chọn danh mục</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${product != null and product.category != null and product.category.id == cat.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-span-full">
+                        <label class="block text-sm font-semibold mb-2">Ảnh sản phẩm</label>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <label for="imageFile" class="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg p-6 hover:border-primary/50 transition-colors group cursor-pointer" id="uploadZone">
+                                <input type="file" name="imageFile" id="imageFile" accept="image/*" style="position:absolute;opacity:0;width:0.1px;height:0.1px;overflow:hidden;pointer-events:none;" tabindex="-1"/>
+                                <span class="material-symbols-outlined text-4xl text-slate-400 group-hover:text-primary mb-2">cloud_upload</span>
+                                <p class="text-sm text-slate-500 mb-4">Kéo thả hoặc chọn tệp từ máy tính</p>
+                                <span class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors pointer-events-none">Chọn tệp</span>
+                            </label>
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-slate-500 mb-2">Hoặc sử dụng Image URL (tùy chọn)</label>
+                                <input class="w-full h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" type="text" th:field="*{image}" id="image" placeholder="https://example.com/image.jpg"/>
+                                <p class="text-red-500 text-sm mt-1" th:if="${imageError}" th:text="${imageError}"></p>
+                                <div class="mt-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center aspect-video min-h-[120px]">
+                                    <div id="imagePreview" class="text-center w-full">
+                                        <img id="previewImg" alt="Xem trước" class="max-h-40 mx-auto rounded-lg object-contain" th:src="${product.image != null and !product.image.isEmpty() ? product.image : ''}" style="display: none;" th:style="${product.image != null and !product.image.isEmpty()} ? 'display: block;' : 'display: none;'"/>
+                                        <div id="previewPlaceholder" th:style="${product.image != null and !product.image.isEmpty()} ? 'display: none;' : 'display: block;'">
+                                            <span class="material-symbols-outlined text-slate-300 text-5xl">image</span>
+                                            <p class="text-xs text-slate-400 mt-2">Xem trước hình ảnh</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-end gap-3">
+                    <a th:href="@{/products}" class="w-full sm:w-32 h-11 px-6 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center no-underline">Hủy</a>
+                    <button class="w-full sm:w-32 h-11 px-6 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all" type="submit">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        (function() {
+            var imageFile = document.getElementById('imageFile');
+            var imageUrl = document.getElementById('image');
+            var previewImg = document.getElementById('previewImg');
+            var previewPlaceholder = document.getElementById('previewPlaceholder');
+
+            function showPreview(src) {
+                if (!previewImg) return;
+                if (previewPlaceholder) previewPlaceholder.style.display = 'none';
+                previewImg.src = src;
+                previewImg.style.display = 'block';
+                previewImg.classList.remove('hidden');
+            }
+            function hidePreview() {
+                if (previewImg) {
+                    previewImg.src = '';
+                    previewImg.style.display = 'none';
+                    previewImg.classList.add('hidden');
+                }
+                if (previewPlaceholder) previewPlaceholder.style.display = 'block';
+            }
+
+            if (imageFile) {
+                imageFile.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        var r = new FileReader();
+                        r.onload = function() { showPreview(r.result); };
+                        r.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
+            if (imageUrl) {
+                imageUrl.addEventListener('input', function() {
+                    var v = (this.value || '').trim();
+                    if (v) showPreview(v); else hidePreview();
+                });
+            }
+
+            var zone = document.getElementById('uploadZone');
+            if (zone && imageFile) {
+                zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('border-primary/50'); });
+                zone.addEventListener('dragleave', function() { zone.classList.remove('border-primary/50'); });
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    zone.classList.remove('border-primary/50');
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        imageFile.files = e.dataTransfer.files;
+                        if (imageFile.files[0]) {
+                            var r = new FileReader();
+                            r.onload = function() { showPreview(r.result); };
+                            r.readAsDataURL(imageFile.files[0]);
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

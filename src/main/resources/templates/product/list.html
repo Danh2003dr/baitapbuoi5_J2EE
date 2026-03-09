@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{_layout :: layout(~{::#main})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách sản phẩm</title>
+</head>
+<body>
+    <div id="main">
+        <!-- Hero Section -->
+        <div class="py-6">
+            <div class="@container">
+                <div class="flex min-h-[320px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-xl items-start justify-end px-6 pb-10 md:px-12 md:pb-12 relative overflow-hidden shadow-xl" style='background-image: linear-gradient(to top, rgba(17, 22, 33, 0.9) 0%, rgba(17, 22, 33, 0.4) 50%, rgba(17, 22, 33, 0.1) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeejHcIZ4vO1QE2dTz7h2TPh5mkpuNaJOTI-IU3XJsIq8fmYLG9yDYpLZmucf5d5sE1Rt7_CSxiA4lBZbM_qzInkEPx1vFvjseODdruzW4XMRJehJmdYYMG9HEMvpBLlWZSBwM2AvcyWJOgLuubNeyqTkXWVGerWPGDuyDaLO-4YYL0ox8OwnLNIuX95zPZX-sE4ym5fMFL-lM-3dxvUAMwtM4ExRzIQwABe2WhLOUeEMQm2BnYJGKJHEYHMytAARtjl_uwhJ61A");'>
+                    <div class="flex flex-col gap-3 text-left relative z-10">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-xs font-bold text-white uppercase tracking-widest">
+                            <span class="material-symbols-outlined text-sm">developer_board</span> J2EE Framework
+                        </div>
+                        <h1 class="text-white text-3xl md:text-5xl font-black leading-tight tracking-tight max-w-2xl">Xây dựng ứng dụng Thymeleaf, JPA và MySQL</h1>
+                        <p class="text-slate-300 text-sm md:text-lg font-normal leading-relaxed max-w-xl">Hệ thống quản lý kho hàng và sản phẩm trực quan, tối ưu cho việc vận hành doanh nghiệp vừa và nhỏ.</p>
+                    </div>
+                    <a th:href="@{/products/add}" class="flex min-w-[140px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold transition-all hover:bg-primary/90 hover:scale-105 shadow-lg active:scale-95 no-underline">
+                        <span class="material-symbols-outlined">add_circle</span>
+                        <span>Thêm sản phẩm</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex flex-col md:flex-row justify-between items-end gap-4 mb-8">
+            <div class="flex flex-col gap-1">
+                <h2 class="text-slate-900 dark:text-slate-100 text-3xl font-extrabold tracking-tight">Danh sách sản phẩm</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-base">Quản lý và cập nhật thông tin chi tiết các mặt hàng trong kho</p>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    <span class="material-symbols-outlined text-lg">filter_list</span> Lọc
+                </button>
+                <button type="button" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    <span class="material-symbols-outlined text-lg">download</span> Xuất Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-16">#</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ảnh</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tên sản phẩm</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Giá bán</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Danh mục</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tr th:if="${#lists.isEmpty(products)}">
+                            <td colspan="6" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">Chưa có sản phẩm nào. Nhấn "Thêm sản phẩm" để tạo mới.</td>
+                        </tr>
+                        <tr th:each="product, stat : ${products}" class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400" th:text="${stat.count}">1</td>
+                            <td class="px-6 py-4">
+                                <img th:if="${product.image != null and !product.image.isEmpty()}" th:src="${product.image}" alt="Ảnh SP" class="size-12 rounded-lg object-cover object-center border border-slate-200 dark:border-slate-700"/>
+                                <span th:unless="${product.image != null and !product.image.isEmpty()}" class="text-slate-400">—</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-slate-900 dark:text-slate-100" th:text="${product.name}">Tên SP</span>
+                                    <span class="text-xs text-slate-400">ID: <span th:text="${product.id}">—</span></span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-semibold text-primary" th:text="|${#numbers.formatInteger(product.price, 3, 'COMMA')}đ|">0đ</td>
+                            <td class="px-6 py-4">
+                                <span th:if="${product.category != null}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" th:text="${product.category.name}">Danh mục</span>
+                                <span th:unless="${product.category != null}" class="text-slate-400">—</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <a th:href="@{/products/edit/{id}(id=${product.id})}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors border border-primary/30" title="Sửa">
+                                        <span class="material-symbols-outlined text-lg">edit_note</span>
+                                        <span>Sửa</span>
+                                    </a>
+                                    <a th:href="@{/products/delete/{id}(id=${product.id})}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-red-200 dark:border-red-800" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                                        <span class="material-symbols-outlined text-lg">delete_sweep</span>
+                                        <span>Xóa</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div th:if="${!#lists.isEmpty(products)}" class="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/20" th:with="total=${#lists.size(products)}">
+                <p class="text-sm text-slate-500 dark:text-slate-400">Hiển thị <span class="font-bold">1-<span th:text="${total}">0</span></span> trong số <span class="font-bold"><span th:text="${total}">0</span></span> sản phẩm</p>
+                <div class="flex items-center gap-1">
+                    <span class="flex size-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 cursor-not-allowed"><span class="material-symbols-outlined text-sm">chevron_left</span></span>
+                    <span class="text-sm font-bold flex size-9 items-center justify-center text-white rounded-lg bg-primary">1</span>
+                    <span class="flex size-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-400 cursor-not-allowed"><span class="material-symbols-outlined text-sm">chevron_right</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
